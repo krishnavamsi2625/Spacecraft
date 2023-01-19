@@ -1,0 +1,1 @@
+Time::DATE_FORMATS[:good_look]="%B %e %Y"

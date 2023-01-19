@@ -1,0 +1,42 @@
+<section class="hero is-success">
+  <!-- Hero head: will stick at the top -->
+  <div class="hero-head">
+    <nav class="navbar">
+      <div class="container">
+        <div class="navbar-brand">
+          <%= link_to root_path, class: "navbar-item" do %>
+            <img src='https://www.tagalys.com/wp-content/uploads/2020/02/New-Tagalys-Black-Logo-Large.png' img length="70px" img width=”70px”>
+            <span class="has-text-weight-bold is-size-4 ml-4 has-text-dark">Home</span>
+          <% end %>
+
+          </a>
+          <span class="navbar-burger burger" data-target="navbarMenuHeroA">
+            <span></span>
+            <span></span>
+            <span></span>
+          </span>
+        </div>
+        <div id="navbarMenuHeroA" class="navbar-menu">
+          <div class="navbar-end">
+            <span class="navbar-item">
+              <%= link_to "Add  new Launch Vehicle", new_launch_vehicle_path, class: "button is-dark" %>
+            </span>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </div>
+
+  <!-- Hero content: will be in the middle -->
+  <div class="hero-body">
+    <div class="container has-text-centered">
+      <h1 class="title has-text-dark" >
+        <% if content_for(:title) %>
+          <%= yield :title %>
+        <% else %>
+          Spacecraft and Launch Vehicles
+        <% end %>
+      </h1>
+    </div>
+  </div>
+</section>

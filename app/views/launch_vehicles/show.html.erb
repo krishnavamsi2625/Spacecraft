@@ -1,0 +1,29 @@
+<% content_for :title do %>
+  <%= @vehicle.name %> &ndash; <%= @vehicle.updated_at.to_fs(:good_look) %>
+<% end %>
+
+<div class="columns mt-6 is-centered">
+  <div class="column is-one-third">
+    <nav class="panel is-link">
+      <p class="panel-heading">
+        <%= @vehicle.name %>:
+        </p>
+      < <div class="card-content">
+          <div class="content">
+              <p>ID: <span class="has-text-weight-bold"><%= @vehicle.id %></span></p>
+              <p>Weight: <span class="has-text-weight-bold"><%= @vehicle.weight %></span> Tons</p>
+              <p>Owned By: <span class="has-text-weight-bold"><%= @vehicle.owned_by %></span></p>
+              <p class="italic">Logged <%= time_ago_in_words(@vehicle.updated_at) %> ago</p>
+          </div>
+        </div>
+
+    <div class="columns is-mobile">
+      <div class="column">
+        <%= link_to "Edit", edit_launch_vehicle_path(@vehicle), class: "button is-gray" %>
+      </div>
+      <div class="column">
+        <!-- -->
+      </div>
+    </div>
+  </div>
+</div>
