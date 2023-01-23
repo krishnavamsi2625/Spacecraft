@@ -2,7 +2,7 @@ class LaunchVehiclesController < ApplicationController
   skip_before_action :verify_authenticity_token
   def index
     @vehicles=LaunchVehicle.all
-    @satellites=Satellite.all
+    @spacecrafts=Spacecraft.all
     render json:@vehicles
   end
   def show
@@ -10,7 +10,7 @@ class LaunchVehiclesController < ApplicationController
         @vehicle=LaunchVehicle.find(params[:id])
         render json:@vehicle
     rescue
-        return render json: {error: "Id not found"},status: 400
+        return render json: {error: "Vehicle not found"},status: 400
         
     end
   end
@@ -22,14 +22,14 @@ class LaunchVehiclesController < ApplicationController
     if @vehicle.save
       render json:{vehicle:@vehicle,notice:"Created Sucessfully"}
     else 
-      return render :new, status: :unprocessable_entity,alert: "Record not Create"
+      return render json:{alert: "Record not Created"}
     end
   end
   def edit 
     begin
       @vehicle=LaunchVehicle.find(params[:id])
     rescue
-      return render json: { alert: "Vehicle Not found",status: 400}
+      return render json: { error: "Vehicle Not found"}
 
     end
   end
@@ -39,17 +39,24 @@ class LaunchVehiclesController < ApplicationController
     rescue 
       return render json: { alert: "Vehicle Not found",status: 400}
     end
+    @totalWeight=@vehicle.spacecrafts.sum(:weight)
+    if(params[:launch_vehicle][:payload]<@totalWeight)
+      return render json:{error:"Cant reduce payload below#{@totalWeight}"}
+    end
     if @vehicle.update(param_validator)
-      render json: { message:"Updated sucessfully"}    
+      render json: { message:"Updated sucessfully",record:@vehicle}    
     else
-      return render json:{status: :unprocessable_entity,notice:"Cant update"} 
+      return render json:{error:"Cant update record"} 
     end
   end
   def destroy
     begin
       @vehicle=LaunchVehicle.find(params[:id])
     rescue 
-      return render json: { alert: "Vehicle Not found",status: 400}    
+      return render json: { error: "Vehicle Not Found",status: 400}    
+    end
+    if(@vehicle.spacecrafts.length!=0)
+      return render json:{Error:"Can't delete  vehcile due to dependent spacecrafts"}
     end
     if @vehicle.destroy
       #redirect_to root_path status: :see_other,notice: "Deleted sucessfully" 

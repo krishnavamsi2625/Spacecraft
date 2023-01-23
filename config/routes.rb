@@ -4,7 +4,7 @@ Rails.application.routes.draw do
   # get "/launchvehicles/new", to:"launch_vehicles#new"
   root "launch_vehicles#index"
   resources :launch_vehicles
-  resources :satellites
+  resources :spacecrafts
   # Defines the root path route ("/")
   # root "articles#index"
 end
