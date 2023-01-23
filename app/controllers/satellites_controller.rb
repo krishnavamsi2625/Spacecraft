@@ -67,7 +67,7 @@ class SatellitesController < ApplicationController
     @sum=@vehicle.satellites.sum(:weight)
     @sum||=0
     @sum+=params[:satellite][:weight]
-    if(@sum>@vehicle.payload)
+    if(@sum-@satellite.weight>@vehicle.payload)
       return render json:{message:"Weight cannot be greater than #{@vehicle.payload-@sum+params[:satellite][:weight]+@satellite.weight}"}
     end
     @temp=param_validator
