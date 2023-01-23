@@ -25,8 +25,8 @@ class SatellitesController < ApplicationController
       #render :edit,notice:"Launch Vehicle not found",status: 400
       return render json:{error: "Launch vehicle not found"}
     end
-    @article_id=LaunchVehicle.find_by(name:params[:satellite][:vehicle_name]).id
-    @vehicle=LaunchVehicle.find(@article_id)
+    @vehicle_id=LaunchVehicle.find_by(name:params[:satellite][:vehicle_name]).id
+    @vehicle=LaunchVehicle.find(@vehicle_id)
     @sum=@vehicle.satellites.sum(:weight)
     @sum||=0
     @sum+=params[:satellite][:weight]
