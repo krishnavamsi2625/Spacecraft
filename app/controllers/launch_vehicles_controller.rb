@@ -40,7 +40,7 @@ class LaunchVehiclesController < ApplicationController
       return render json: { alert: "Vehicle Not found",status: 400}
     end
     if @vehicle.update(param_validator)
-      render json: { message:"Updated sucressfully"}    
+      render json: { message:"Updated sucessfully"}    
     else
       return render json:{status: :unprocessable_entity,notice:"Cant update"} 
     end
@@ -55,11 +55,11 @@ class LaunchVehiclesController < ApplicationController
       #redirect_to root_path status: :see_other,notice: "Deleted sucessfully" 
       render json:{message:"Deleted sucessfully"}
     else
-      return render json:{error:"Cant Update"}
+      return render json:{error:"Cant Delete"}
     end
   end
   private
   def param_validator
-    params.require(:launch_vehicle).permit(:name,:weight,:owned_by)
+    params.require(:launch_vehicle).permit(:name,:weight,:owned_by,:payload)
   end
 end

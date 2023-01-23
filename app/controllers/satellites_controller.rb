@@ -27,6 +27,12 @@ class SatellitesController < ApplicationController
     end
     @article_id=LaunchVehicle.find_by(name:params[:satellite][:vehicle_name]).id
     @vehicle=LaunchVehicle.find(@article_id)
+    @sum=@vehicle.satellites.sum(:weight)
+    @sum||=0
+    @sum+=params[:satellite][:weight]
+    if(@sum>@vehicle.payload)
+      return render json:{message:"Weight cannot be greater than #{@vehicle.payload-@sum+params[:satellite][:weight]}"}
+    end
     @temp=param_validator
     @temp['launch_vehicle']=@vehicle
     @satellite=Satellite.create(@temp)
@@ -56,8 +62,14 @@ class SatellitesController < ApplicationController
     if !(LaunchVehicle.pluck(:name).include?params[:satellite][:vehicle_name])
       return render json:{error: "Launch vehicle not found"},status: 400
     end
-    @article_id=LaunchVehicle.find_by(name:params[:satellite][:vehicle_name]).id
-    @vehicle=LaunchVehicle.find(@article_id)
+    @vehicle_id=LaunchVehicle.find_by(name:params[:satellite][:vehicle_name]).id
+    @vehicle=LaunchVehicle.find(@vehicle_id)
+    @sum=@vehicle.satellites.sum(:weight)
+    @sum||=0
+    @sum+=params[:satellite][:weight]
+    if(@sum-@satellite.weight>@vehicle.payload)
+      return render json:{message:"Weight cannot be greater than #{@vehicle.payload-@sum+params[:satellite][:weight]+@satellite.weight}"}
+    end
     @temp=param_validator
     @temp['launch_vehicle']=@vehicle
     if @satellite.update(@temp)
