@@ -1,0 +1,42 @@
+<%= form_with model: spacecraft do |form|%>
+ <div>
+    <%= form.label :name %>
+    <%= form.text_field :name %>
+    <%= spacecraft.errors.full_messages_for(:name).first do |message|%>
+        <div><%= message%></div>
+    <%end%>
+</div><br>
+<div>
+    <%= form.label :weight %>
+    <%= form.number_field :weight %>
+    <%= spacecraft.errors.full_messages_for(:weight).first do |message|%>
+        <h6><%= message%></h6>
+    <%end%>
+</div><br>
+<div>
+<div>
+    <%= form.label :launch_date %>
+    <%= form.date_field :launch_date %>
+    <%= spacecraft.errors.full_messages_for(:weight).first do |message|%>
+        <h6><%= message%></h6>
+    <%end%>
+</div><br>
+<div>
+<%=form.label :owned_by%>
+<%= form.select :owned_by,["ISRO","NASA","CNSA","RFSA","ESA"],selected: "ISRO"%>
+<% spacecraft.errors.full_messages_for(:owned_by).each do |message| %>
+      <div><%= message %></div>
+ <% end %>
+ </div><br>
+<%=form.label :vehicle_name%>
+<%= form.select :vehicle_name,LaunchVehicle.pluck(:name).to_a,selected: LaunchVehicle.pluck(:name).to_a[0]%>
+<% spacecraft.errors.full_messages_for(:vehicle_name).each do |message| %>
+      <div><%= message %></div>
+ <% end %>
+ </div><br>
+<div class="actions">
+<%= form.submit class: "button is sucess" %>
+</div>
+<%end%>
+
+
