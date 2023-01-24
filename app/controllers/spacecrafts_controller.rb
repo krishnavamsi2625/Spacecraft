@@ -7,9 +7,9 @@ class SpacecraftsController < ApplicationController
   def show
     begin
         @spacecraft=Spacecraft.find(params[:id])
-        render json:@spacecraft
+        render json:{spacecraft:@spacecraft,Vehicle:@spacecraft.launch_vehicle}
     rescue
-        return render json: {error: "Spacecraft not found"},status: 400
+        return render json: {error: "Spacecraft not found",status:404}
         
     end
   end
@@ -23,10 +23,13 @@ class SpacecraftsController < ApplicationController
     end
     if !(LaunchVehicle.pluck(:name).include?params[:spacecraft][:vehicle_name])
       #render :edit,notice:"Launch Vehicle not found",status: 400
-      return render json:{error: "Launch vehicle not found"}
+      return render json:{error: "Launch vehicle not found",status:404}
     end
     @vehicle_id=LaunchVehicle.find_by(name:params[:spacecraft][:vehicle_name]).id
     @vehicle=LaunchVehicle.find(@vehicle_id)
+    if(!@vehicle.reusable&&@vehicle.spacecrafts.count==1)
+      return render json:{alert:"Launch Vehicle Non-reusable"}
+    end
     @sum=@vehicle.spacecrafts.sum(:weight)
     if(@sum==@vehicle.payload)
       return render json:{alert:"Vehicle full"}
@@ -52,7 +55,7 @@ class SpacecraftsController < ApplicationController
       @spacecraft=Spacecraft.find(params[:id])
     rescue
       #redirect_to root_path,alert: exception.full_message
-      return render json:{error:" Spacecraft Not found"}
+      return render json:{error:" Spacecraft Not found",status:404}
     end
   end
   def update
@@ -60,13 +63,16 @@ class SpacecraftsController < ApplicationController
       @spacecraft=Spacecraft.find(params[:id])
     rescue
       #redirect_to root_path,alert: "Cannot Update"
-      return render json:{alert: "Cannot Find Record"}
+      return render json:{error: "Cannot Find Record",status:404}
     end
     if !(LaunchVehicle.pluck(:name).include?params[:spacecraft][:vehicle_name])
-      return render json:{error: "Launch vehicle not found"},status: 400
+      return render json:{error: "Launch vehicle not found",status:404}
     end
     @vehicle_id=LaunchVehicle.find_by(name:params[:spacecraft][:vehicle_name]).id
     @vehicle=LaunchVehicle.find(@vehicle_id)
+    if(!@vehicle.reusable&&@vehicle.spacecrafts.count==1&&@vehicle.spacecrafts.ids.exclude?(@spacecraft.id))
+      return render json:{Message:"Launch Vehicle Non-reusable"}
+    end
     @sum=@vehicle.spacecrafts.sum(:weight)
     @sum||=0
     @sum+=params[:spacecraft][:weight]
@@ -87,7 +93,7 @@ class SpacecraftsController < ApplicationController
     begin
       @spacecraft=Spacecraft.find(params[:id])
     rescue
-      return render json:{alert:"Spacecraft Not Found"}
+      return render json:{error:"Spacecraft Not Found",status:404}
     end  
     if @spacecraft.destroy
       #redirect_to root_path status: :see_other,notice: "Deleted sucessfully"  

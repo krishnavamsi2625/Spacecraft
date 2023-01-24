@@ -8,9 +8,13 @@ class LaunchVehiclesController < ApplicationController
   def show
     begin
         @vehicle=LaunchVehicle.find(params[:id])
-        render json:@vehicle
+        if (@vehicle.spacecrafts.count==0)
+          render json:{vehcile:@vehicle}
+        else
+          render json:{Vehicle:@vehicle,launches:@vehicle.spacecrafts}
+        end
     rescue
-        return render json: {error: "Vehicle not found"},status: 400
+        return render json:{error: "Vehicle not found",status:404}
         
     end
   end
@@ -29,7 +33,7 @@ class LaunchVehiclesController < ApplicationController
     begin
       @vehicle=LaunchVehicle.find(params[:id])
     rescue
-      return render json: { error: "Vehicle Not found"}
+      return render json: { error: "Vehicle Not found",status:404}
 
     end
   end
@@ -37,7 +41,7 @@ class LaunchVehiclesController < ApplicationController
     begin
       @vehicle=LaunchVehicle.find(params[:id])
     rescue 
-      return render json: { alert: "Vehicle Not found",status: 400}
+      return render json: { alert: "Vehicle Not found",status: 404}
     end
     @totalWeight=@vehicle.spacecrafts.sum(:weight)
     if(params[:launch_vehicle][:payload]<@totalWeight)
@@ -53,7 +57,7 @@ class LaunchVehiclesController < ApplicationController
     begin
       @vehicle=LaunchVehicle.find(params[:id])
     rescue 
-      return render json: { error: "Vehicle Not Found",status: 400}    
+      return render json: { error: "Vehicle Not Found",status: 404}    
     end
     if(@vehicle.spacecrafts.length!=0)
       return render json:{Error:"Can't delete  vehcile due to dependent spacecrafts"}
@@ -67,6 +71,6 @@ class LaunchVehiclesController < ApplicationController
   end
   private
   def param_validator
-    params.require(:launch_vehicle).permit(:name,:weight,:owned_by,:payload)
+    params.require(:launch_vehicle).permit(:name,:weight,:owned_by,:payload,:reusable)
   end
 end

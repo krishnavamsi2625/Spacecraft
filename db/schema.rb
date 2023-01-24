@@ -10,8 +10,18 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_01_23_064447) do
-  create_table "Spacecrafts", force: :cascade do |t|
+ActiveRecord::Schema[7.0].define(version: 2023_01_24_065346) do
+  create_table "launch_vehicles", force: :cascade do |t|
+    t.string "name"
+    t.integer "weight"
+    t.string "owned_by"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "payload"
+    t.boolean "reusable"
+  end
+
+  create_table "spacecrafts", force: :cascade do |t|
     t.string "name"
     t.integer "weight"
     t.date "launch_date"
@@ -22,14 +32,5 @@ ActiveRecord::Schema[7.0].define(version: 2023_01_23_064447) do
     t.index ["launch_vehicle_id"], name: "index_satellites_on_launch_vehicle_id"
   end
 
-  create_table "launch_vehicles", force: :cascade do |t|
-    t.string "name"
-    t.integer "weight"
-    t.string "owned_by"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.integer "payload"
-  end
-
-  add_foreign_key "Spacecrafts", "launch_vehicles"
+  add_foreign_key "spacecrafts", "launch_vehicles"
 end

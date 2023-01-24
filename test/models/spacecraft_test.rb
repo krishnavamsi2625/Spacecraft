@@ -1,6 +1,6 @@
 require "test_helper"
 
-class SatellitesControllerTest < ActionDispatch::IntegrationTest
+class SpacecraftTest < ActiveSupport::TestCase
   # test "the truth" do
   #   assert true
   # end

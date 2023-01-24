@@ -1,5 +1,5 @@
 class Spacecraft < ApplicationRecord
-  belongs_to :launch_vehicle
+  belongs_to  :launch_vehicle
   #validate :weight,numericality: {only_integer:true,lesser_than_or_equal_to: :sum_weight}
   # def sum_weight
     
