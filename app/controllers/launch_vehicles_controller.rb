@@ -11,7 +11,7 @@ class LaunchVehiclesController < ApplicationController
         if (@vehicle.spacecrafts.count==0)
           render json:{vehcile:@vehicle}
         else
-          render json:{vehicle:@vehicle,launches:@vehicle.spacecrafts}
+          render json:{vehicle:@vehicle,launches:@vehicle.spacecrafts,launch_dates:@vehicle.launches.pluck(:launch_date)}
         end
     rescue
         return render json:{error: "Vehicle not found"}
@@ -57,7 +57,7 @@ class LaunchVehiclesController < ApplicationController
     begin
       @vehicle=LaunchVehicle.find(params[:id])
     rescue 
-      return render json: { error: "Vehicle Not Found",status: 404}    
+      return render json: { error: "Vehicle Not Found"}    
     end
     if(@vehicle.spacecrafts.length!=0)
       return render json:{error:"Can't delete  vehcile due to dependent spacecrafts"}
