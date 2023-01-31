@@ -7,9 +7,9 @@ class SpacecraftsController < ApplicationController
   def show
     begin
         @spacecraft=Spacecraft.find(params[:id])
-        render json:{spacecraft:@spacecraft,Vehicle:@spacecraft.launch_vehicle}
+        render json:{spacecraft:@spacecraft,vehicle:@spacecraft.launch_vehicle}
     rescue
-        return render json: {error: "Spacecraft not found",status:404}
+        return render json: {error: "Spacecraft not found"}
         
     end
   end
@@ -28,23 +28,38 @@ class SpacecraftsController < ApplicationController
     @vehicle_id=LaunchVehicle.find_by(name:params[:spacecraft][:vehicle_name]).id
     @vehicle=LaunchVehicle.find(@vehicle_id)
     if(!@vehicle.reusable&&@vehicle.spacecrafts.count==1)
-      return render json:{alert:"Launch Vehicle Non-reusable"}
+      return render json:{error:"Launch Vehicle Non-reusable"}
     end
-    @sum=@vehicle.spacecrafts.sum(:weight)
-    if(@sum==@vehicle.payload)
-      return render json:{alert:"Vehicle full"}
+    date=params[:spacecraft][:launch_date]
+    if(date==nil||date==""||date==" ")
+      save_attribute=valid_param
+      @spacecraft=Spacecraft.create(save_attribute)
+      if @spacecraft.id?
+        #redirect_to @vehicle,notice:"Created Sucessfully"
+        return render json:{spacecraft:@spacecraft,notice:"Created Sucessfully"}
+      else 
+        #render :new, status: :unprocessable_entity,alert: "Record not Created"
+        return render json:{error:"Record not created"}
+      end
     end
-    @sum||=0
-    @sum+=params[:spacecraft][:weight]
-    if(@sum>@vehicle.payload)
-      return render json:{message:"Weight cannot be greater than #{@vehicle.payload-@sum+params[:spacecraft][:weight]}"}
+    if(Launch.exists?(launch_date:date))
+      return render json:{error:"Launch Vehicle Already in Use!! "}
     end
-    @temp=param_validator
-    @temp['launch_vehicle']=@vehicle
-    @spacecraft=Spacecraft.create(@temp)
-    if @spacecraft.save
+    sum=@vehicle.spacecrafts.sum(:weight)
+    if(sum==@vehicle.payload)
+      return render json:{error:"Vehicle full"}
+    end
+    sum||=0
+    sum+=params[:spacecraft][:weight]
+    if(sum>@vehicle.payload)
+      return render json:{message:"Weight cannot be greater than #{@vehicle.payload-sum+params[:spacecraft][:weight]}"}
+    end
+    save_attribute=valid_param
+    @spacecraft=Spacecraft.create(save_attribute)
+    if @spacecraft.id?
       #redirect_to @vehicle,notice:"Created Sucessfully"
-      render json:{Spacecraft:@spacecraft,notice:"Created Sucessfully"}
+      Launch.create(launch_date:date,launch_vehicle:@vehicle,spacecraft:@spacecraft)
+      render json:{spacecraft:@spacecraft,notice:"Created Sucessfully"}
     else 
       #render :new, status: :unprocessable_entity,alert: "Record not Created"
       return render json:{error:"Record not created"}
@@ -55,7 +70,7 @@ class SpacecraftsController < ApplicationController
       @spacecraft=Spacecraft.find(params[:id])
     rescue
       #redirect_to root_path,alert: exception.full_message
-      return render json:{error:" Spacecraft Not found",status:404}
+      return render json:{error:" Spacecraft Not found"}
     end
   end
   def update
@@ -63,26 +78,43 @@ class SpacecraftsController < ApplicationController
       @spacecraft=Spacecraft.find(params[:id])
     rescue
       #redirect_to root_path,alert: "Cannot Update"
-      return render json:{error: "Cannot Find Record",status:404}
+      return render json:{error: "Cannot Find Record"}
     end
     if !(LaunchVehicle.pluck(:name).include?params[:spacecraft][:vehicle_name])
       return render json:{error: "Launch vehicle not found",status:404}
     end
     @vehicle_id=LaunchVehicle.find_by(name:params[:spacecraft][:vehicle_name]).id
     @vehicle=LaunchVehicle.find(@vehicle_id)
+    date=params[:spacecraft][:launch_date]
     if(!@vehicle.reusable&&@vehicle.spacecrafts.count==1&&@vehicle.spacecrafts.ids.exclude?(@spacecraft.id))
-      return render json:{Message:"Launch Vehicle Non-reusable"}
+      return render json:{error:"Launch Vehicle Non-reusable"}
     end
-    @sum=@vehicle.spacecrafts.sum(:weight)
-    @sum||=0
-    @sum+=params[:spacecraft][:weight]
-    if(@sum-@spacecraft.weight>@vehicle.payload)
-      return render json:{message:"Weight cannot be greater than #{@vehicle.payload-@sum+params[:spacecraft][:weight]+@spacecraft.weight}"}
+    if(Launch.exists?(launch_date:date)&& date.to_date!=@spacecraft.launch_date)
+      return render json:{error:"Launch Vehicle Already in Use!! "}
     end
-    @temp=param_validator
-    @temp['launch_vehicle']=@vehicle
-    if @spacecraft.update(@temp)
+    if(@spacecraft.launch_date!=nil)
+      Launch.destroy_by(launch_date:@spacecraft.launch_date)
+    end
+    if(date==nil||date==""||date==" ")
+      save_attribute=valid_param
+      byebug
+      if @spacecraft.update
+        #redirect_to @vehicle,notice:"Created Sucessfully"
+        return render json:{spacecraft:@spacecraft,notice:"Updated Sucessfully"}
+      else 
+        #render :new, status: :unprocessable_entity,alert: "Record not Created"
+        return render json:{error:"Record not updated"}
+      end
+    end
+    sum=@vehicle.spacecrafts.sum(:weight)
+    sum+=params[:spacecraft][:weight]
+    if(sum-@spacecraft.weight>@vehicle.payload)
+      return render json:{message:"Weight cannot be greater than #{@vehicle.payload-sum+params[:spacecraft][:weight]+@spacecraft.weight}"}
+    end
+    save_attribute=valid_param
+    if @spacecraft.update(save_attribute)
       #redirect_to  root_path,notice: "Record Updated sucessfully"
+      Launch.create(launch_date:date,launch_vehicle:@vehicle,spacecraft:@spacecraft)
       render json:{message:"Updated Sucessfully",record:@spacecraft}
     else
       #render :edit,status: :unprocessable_entity,alert:"Cant update" 
@@ -94,8 +126,12 @@ class SpacecraftsController < ApplicationController
       @spacecraft=Spacecraft.find(params[:id])
     rescue
       return render json:{error:"Spacecraft Not Found",status:404}
-    end  
-    if @spacecraft.destroy
+    end
+    date=@spacecraft.launch_date
+    if(date!=nil)
+      Launch.destroy_by(launch_date:date)
+    end
+      if @spacecraft.destroy
       #redirect_to root_path status: :see_other,notice: "Deleted sucessfully"  
       render json:{message:"Deleted sucessfully"}
     else
@@ -103,7 +139,7 @@ class SpacecraftsController < ApplicationController
     end
   end
   private
-  def param_validator
+  def valid_param
     params.require(:spacecraft).permit(:name,:weight,:owned_by,:launch_date)
   end
 end
