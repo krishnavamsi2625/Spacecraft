@@ -5,7 +5,7 @@ Rails.application.routes.draw do
   root "launch_vehicles#index"
   resources :launch_vehicles
   resources :spacecrafts
-  get "/launches",to:"launches#index"
+  post "/launches/:id",to:"launches#launch"
   # Defines the root path route ("/")
   # root "articles#index"
 end
