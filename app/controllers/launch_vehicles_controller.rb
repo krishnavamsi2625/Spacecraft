@@ -57,9 +57,10 @@ class LaunchVehiclesController < ApplicationController
     rescue 
       return render json: {error: "Vehicle Not Found"}    
     end
-    if(@vehicle.spacecrafts.length!=0)
+    if(@vehicle.spacecrafts.count!=0)
       return render json:{error: "Can't delete  vehcile due to dependent spacecrafts"}
     end
+    LaunchVehicle.find(1).launches.destroy_all
     if @vehicle.destroy
       #redirect_to root_path status: :see_other,notice: "Deleted sucessfully" 
       render json:{message: "Deleted sucessfully"}

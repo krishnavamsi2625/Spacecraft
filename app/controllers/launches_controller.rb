@@ -10,7 +10,7 @@ class LaunchesController < ApplicationController
       return render json: {error: "Vehicle Not found"}
     end
     spacecraft_ids=params[:spacecrafts][:ids]
-    launch=Launch.create(launch_date: DateTime.now, launch_vehicle: vehicle, payload: 0)
+    launch=Launch.create(launch_date: DateTime.now, launch_vehicle: vehicle)
     spacecraft_ids.each do |id|
       if(Spacecraft.exists?(id:id))
         spacecraft=Spacecraft.find(id)
