@@ -8,8 +8,13 @@ class LaunchVehiclesController < ApplicationController
   def show
     begin
         @vehicle=LaunchVehicle.find(params[:id])
-        render json:@vehicle
-    rescue
+        launches={}
+        @vehicle.launches.to_a.each do |launch|
+          spacecrafts=launch.spacecrafts.all
+          launches[launch.launch_date]=spacecrafts
+        end 
+        render json:{Vehcile:@vehicle,launches:launches}
+    rescue 
         return render json: {error: "Vehicle not found"},status: 400
         
     end

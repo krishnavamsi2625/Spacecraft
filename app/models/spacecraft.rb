@@ -2,7 +2,7 @@ class Spacecraft < ApplicationRecord
   belongs_to :launch, optional: true
   validate :launch_vehicle_can_carry
   def launch_vehicle_can_carry
-    if(launch_id==nil)
+    if(launch==nil)
       return
     end
     if(!launch.launch_vehicle.reusable&&launch.spacecrafts.any?)
