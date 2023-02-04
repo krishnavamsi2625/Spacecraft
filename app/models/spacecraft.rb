@@ -1,5 +1,6 @@
 class Spacecraft < ApplicationRecord
   belongs_to :launch, optional: true
+  has_many:launch_vehicle,through: :launch
   validate :launch_vehicle_can_carry
   def launch_vehicle_can_carry
     if(launch==nil)

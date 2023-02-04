@@ -7,7 +7,8 @@ class SpacecraftsController < ApplicationController
   def show
     begin
         @spacecraft = Spacecraft.find(params[:id])
-        render json:@spacecraft
+        render json:{Spacecraft:@spacecraft,LaunchVehicle:@spacecraft.launch_vehicle}
+        #render json:@spacecraft
     rescue
         return render json: {error: "Spacecraft not found"}
         
