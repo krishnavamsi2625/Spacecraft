@@ -1,0 +1,209 @@
+{
+	"info": {
+		"_postman_id": "cbe221f1-10c7-4bbf-b5b4-b98a56b5d9e9",
+		"name": "ES_Query",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "25418067"
+	},
+	"item": [
+		{
+			"name": "spacecraft_name",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"spacecrafts\":{\"name\":\"Chadrayan\"}}"
+				},
+				"url": {
+					"raw": "http://localhost:2625/queries/spacecrafts_name",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "2625",
+					"path": [
+						"queries",
+						"spacecrafts_name"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "launch_vehicles_range",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"launch_vehicles\":{\"from\":\"05/02/2023\",\"to\":\"07/02/2023\"}}"
+				},
+				"url": {
+					"raw": "http://localhost:2625/queries/launch_vehicles_range/2",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "2625",
+					"path": [
+						"queries",
+						"launch_vehicles_range",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "launch_vehicles_spacecrafts",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"launch_vehicles\":{\"spacecraft_ids\":[1,2,3]}}"
+				},
+				"url": {
+					"raw": "http://localhost:2625/queries/launch_vehicles_spacecrafts",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "2625",
+					"path": [
+						"queries",
+						"launch_vehicles_spacecrafts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "launch_vehicles_spacecrafts_cordinator",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"launch_vehicles\":{\"spacecraft_ids\":[1,3],\"cordinator\":\"abc\"}}"
+				},
+				"url": {
+					"raw": "http://localhost:2625/queries/launch_vehicles_spacecrafts_cordinator",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "2625",
+					"path": [
+						"queries",
+						"launch_vehicles_spacecrafts_cordinator"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "launch_vehicles_top_hits",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"launch_vehicles\":{\"spacecraft_ids\":[1,3],\"cordinator\":\"abc\"}}"
+				},
+				"url": {
+					"raw": "http://localhost:2625/queries/launch_vehicles_top_hits",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "2625",
+					"path": [
+						"queries",
+						"launch_vehicles_top_hits"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "launch_vehicles_bool",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"launch_vehicles\":{\"payload_from\":10,\"payload_to\":40,\"cordinator\":\"xyz\",\"reusable\":\"false\"}}"
+				},
+				"url": {
+					"raw": "http://localhost:2625/queries/launch_vehicles_bool",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "2625",
+					"path": [
+						"queries",
+						"launch_vehicles_bool"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

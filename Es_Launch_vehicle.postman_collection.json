@@ -1,0 +1,169 @@
+{
+	"info": {
+		"_postman_id": "4b7dc606-7b2e-41ea-a318-ad1ee4117c87",
+		"name": "Es_Launch_vehicle",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "25418067"
+	},
+	"item": [
+		{
+			"name": "Delete index",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:2625/launch_vehicles",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "2625",
+					"path": [
+						"launch_vehicles"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "mapping",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:2625/launch_vehicles/mapping",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "2625",
+					"path": [
+						"launch_vehicles",
+						"mapping"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "autopoulate",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:2625/launch_vehicles/autopopulate",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "2625",
+					"path": [
+						"launch_vehicles",
+						"autopopulate"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "new",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"launch_vehicle\": {\n        \"name\": \"Test 3\",\n        \"payload\": 60,\n        \"reusable\": true,\n        \"launch_date\":\"2023-02-08\",\n        \"cordinator\" : \"tuv\"\n    }\n}"
+				},
+				"url": {
+					"raw": "http://localhost:2625/launch_vehicles/new",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "2625",
+					"path": [
+						"launch_vehicles",
+						"new"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete_doc",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:2625/launch_vehicles/4",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "2625",
+					"path": [
+						"launch_vehicles",
+						"4"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "update_vehicle",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"launch_vehicle\": {\n        \"name\": \"Test 4\",\n        \"payload\": 70,\n        \"reusable\": false\n    }\n}"
+				},
+				"url": {
+					"raw": "http://localhost:2625/launch_vehicles/4",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "2625",
+					"path": [
+						"launch_vehicles",
+						"4"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "show",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:2625/launch_vehicles/4",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "2625",
+					"path": [
+						"launch_vehicles",
+						"4"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

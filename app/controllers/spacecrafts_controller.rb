@@ -1,103 +1,104 @@
 class SpacecraftsController < ApplicationController
   skip_before_action :verify_authenticity_token
-  def index
-    @spacecrafts=Spacecraft.all
-    render json:@spacecrafts
-  end
   def show
+    spacecraft_id=params[:id]
     begin
-        @spacecraft=Spacecraft.find(params[:id])
-        render json:@spacecraft
-    rescue
-        return render json: {error: "Spacecraft not found"},status: 400
-        
+      doc=$client.get(index:"spacecrafts",id:spacecraft_id)
+      render json:{document:[doc]}
+    rescue 
+      render json:{error:"Spacecraft not found"}
+    end
+  end
+  def mapping
+      spacecraft_mapping={
+          "mappings": {
+            "properties": {
+              "name": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                  }
+                }
+              },
+              "weight": {
+                "type": "integer"
+              },
+              "launch_date": {
+                "type": "date"
+              },
+              "launch_vehicle_id": {
+                "type": "keyword"
+              }
+            }
+          }
+        }
+      begin
+        $client.indices.create(index:"spacecrafts",body:spacecraft_mapping)
+        render json:{message:"Created mappings sucessfully"}
+      rescue 
+        render json:{error:"Can't  create  mappings"}
+      end
+  end
+  def bulk
+    index=count
+    body=[
+      {index:{_index:'spacecrafts',_id:index+1}},
+      { "name": "Chadrayan advanced", "weight": 20, "launch_date": "2023-02-05", "launch_vehicle_id": 1 },
+      {index:{_index:'spacecrafts',_id:index+2}},
+      { "name": "Chadrayan basic", "weight": 30, "launch_date": "2023-02-06", "launch_vehicle_id": 2 },
+      {index:{_index:'spacecrafts',_id:index+3}},
+      { "name": "Test spacecraft", "weight": 20, "launch_date": "2023-02-07", "launch_vehicle_id": 1 }
+    ]
+    begin
+      $client.bulk(body:body)
+      render json:{message:"Bulk Updated the index sucessfully"}
+    rescue 
+      render json:{error:"Can't bulk update  index"}
     end
   end
   def new
-    @spacecraft=Spacecraft.new
-  end
-  def create
-    if !(LaunchVehicle.ids.to_a.any?)
-        #redirect_to new_launch_vehicle_path,notice:"Create Launch vehicle to proceed" 
-        return render json:{error: "Create Launch vehicle to proceed"}
-    end
-    if !(LaunchVehicle.pluck(:name).include?params[:spacecraft][:vehicle_name])
-      #render :edit,notice:"Launch Vehicle not found",status: 400
-      return render json:{error: "Launch vehicle not found"}
-    end
-    @vehicle_id=LaunchVehicle.find_by(name:params[:spacecraft][:vehicle_name]).id
-    @vehicle=LaunchVehicle.find(@vehicle_id)
-    @sum=@vehicle.spacecrafts.sum(:weight)
-    if(@sum==@vehicle.payload)
-      return render json:{alert:"Vehicle full"}
-    end
-    @sum||=0
-    @sum+=params[:spacecraft][:weight]
-    if(@sum>@vehicle.payload)
-      return render json:{message:"Weight cannot be greater than #{@vehicle.payload-@sum+params[:spacecraft][:weight]}"}
-    end
-    @temp=param_validator
-    @temp['launch_vehicle']=@vehicle
-    @spacecraft=Spacecraft.create(@temp)
-    if @spacecraft.save
-      #redirect_to @vehicle,notice:"Created Sucessfully"
-      render json:{Spacecraft:@spacecraft,notice:"Created Sucessfully"}
-    else 
-      #render :new, status: :unprocessable_entity,alert: "Record not Created"
-      return render json:{error:"Record not created"}
-    end
-  end
-  def edit
+    body=valid_param
     begin
-      @spacecraft=Spacecraft.find(params[:id])
+      doc=$client.index(index:'spacecrafts',body:body,id:(count+1))
+      render json:{message:"Created Doc sucessfully",document:[doc]}
     rescue
-      #redirect_to root_path,alert: exception.full_message
-      return render json:{error:" Spacecraft Not found"}
+      render json:{error:"Cant Create Doc"}
     end
   end
   def update
+    body={}
+    body['doc']=valid_param
     begin
-      @spacecraft=Spacecraft.find(params[:id])
+      doc=$client.update(index:'spacecrafts',body:body,id:params[:id])
+      render json:{message:"Updated Doc sucessfully",document:[doc]}
     rescue
-      #redirect_to root_path,alert: "Cannot Update"
-      return render json:{alert: "Cannot Find Record"}
-    end
-    if !(LaunchVehicle.pluck(:name).include?params[:spacecraft][:vehicle_name])
-      return render json:{error: "Launch vehicle not found"},status: 400
-    end
-    @vehicle_id=LaunchVehicle.find_by(name:params[:spacecraft][:vehicle_name]).id
-    @vehicle=LaunchVehicle.find(@vehicle_id)
-    @sum=@vehicle.spacecrafts.sum(:weight)
-    @sum||=0
-    @sum+=params[:spacecraft][:weight]
-    if(@sum-@spacecraft.weight>@vehicle.payload)
-      return render json:{message:"Weight cannot be greater than #{@vehicle.payload-@sum+params[:spacecraft][:weight]+@spacecraft.weight}"}
-    end
-    @temp=param_validator
-    @temp['launch_vehicle']=@vehicle
-    if @spacecraft.update(@temp)
-      #redirect_to  root_path,notice: "Record Updated sucessfully"
-      render json:{message:"Updated Sucessfully",record:@spacecraft}
-    else
-      #render :edit,status: :unprocessable_entity,alert:"Cant update" 
-      return render json:{error:"Cant Update Record"}
+      render json:{error:"Cant Update Doc"}
     end
   end
-  def destroy
+  def destroy_index
+      begin
+        $client.indices.delete(index:"spacecrafts")
+        render json:{message:"Deleted the index sucessfully"}
+      rescue 
+        render json:{error:"Can't Delete Index"}
+      end
+  end
+  def delete
     begin
-      @spacecraft=Spacecraft.find(params[:id])
+      $client.delete(index:'spacecrafts',id:params[:id])
+      render json:{message:"Deleted Sucessfully"}
     rescue
-      return render json:{alert:"Spacecraft Not Found"}
-    end  
-    if @spacecraft.destroy
-      #redirect_to root_path status: :see_other,notice: "Deleted sucessfully"  
-      render json:{message:"Deleted sucessfully"}
-    else
-      return render json:{error:"Cant Delete"}
+      render json:{error:"Cant delete"}
     end
+
   end
   private
-  def param_validator
-    params.require(:spacecraft).permit(:name,:weight,:owned_by,:launch_date)
-  end
+    def count
+      $client.count(index:'spacecrafts')['count']
+    end
+    def valid_param
+      params.require(:spacecraft).permit(:name,:weight,:launch_date,:launch_vehicle_id)
+    end
 end
